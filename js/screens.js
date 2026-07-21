@@ -737,6 +737,150 @@ const Screens = {
         self._done('設定を最初の状態へ戻しました。');
       });
     }
+
+    this._setupSaveData();
+  },
+
+  /* =============================================================
+     セーブデータの持ち出し・持ち込み・全消し（仕様書 26）
+     -------------------------------------------------------------
+     この端末のブラウザにためている記録は、
+     ブラウザのデータを消すと一緒に消えます。
+     取り返しがつかないので、ファイルへ書き出せるようにします。
+     ============================================================= */
+  _setupSaveData: function () {
+    const self = this;
+
+    /* --- 書き出す --- */
+    const exportBtn = document.getElementById('opt-save-export');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', function () {
+        let text = null;
+        try {
+          text = SaveManager.exportText();
+        } catch (e) {
+          self._done('書き出せませんでした。');
+          Errors.note('セーブデータの書き出しに失敗：' + e.message);
+          return;
+        }
+        self._downloadText(SaveManager.exportFileName(), text);
+        self._done('セーブデータを書き出しました。');
+      });
+    }
+
+    /* --- 読み込む --- */
+    const importBtn = document.getElementById('opt-save-import');
+    const fileInput = document.getElementById('opt-save-file');
+    if (importBtn && fileInput) {
+      importBtn.addEventListener('click', function () {
+        /* 上書きになることを、選ぶ前に伝えます。
+           選んだあとに聞くと、選び直す手間がかかります。 */
+        showDialog({
+          title: 'セーブデータを読み込む',
+          message: 'いまの設定・所持カード・自作デッキ・チュートリアルの記録は、\n' +
+                   '読み込んだ内容に置き換わります。\n\n続けますか？',
+          buttons: [
+            { label: 'やめる' },
+            { label: 'ファイルを選ぶ', primary: true, onClick: function () {
+                fileInput.value = '';      // 同じファイルを続けて選べるようにする
+                fileInput.click();
+              } },
+          ],
+        });
+      });
+
+      fileInput.addEventListener('change', function () {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function () {
+          const r = SaveManager.importText(String(reader.result || ''));
+          if (!r.ok) {
+            self._done('読み込めませんでした。');
+            showDialog({
+              title: '読み込めませんでした',
+              message: r.reason + '\n\nいまのデータはそのままです。',
+              buttons: [{ label: '閉じる', primary: true }],
+            });
+            return;
+          }
+
+          /* 直したところがあれば、黙って進めずに知らせます。
+             「なぜか一部が違う」という状態を作らないためです。 */
+          const fixed = (r.repairs && r.repairs.length)
+            ? '\n\n次の点を直して読み込みました。\n・' + r.repairs.join('\n・')
+            : '';
+          self._afterSaveDataChanged();
+          showDialog({
+            title: '読み込みました',
+            message: 'セーブデータを読み込みました。' + fixed,
+            buttons: [{ label: '閉じる', primary: true }],
+          });
+        };
+        reader.onerror = function () {
+          self._done('ファイルを読めませんでした。');
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    /* --- すべて初期化（二段階で確認します：仕様書 26.3） --- */
+    const resetAll = document.getElementById('opt-save-reset');
+    if (resetAll) {
+      resetAll.addEventListener('click', function () {
+        showDialog({
+          title: 'すべて初期化',
+          message: 'すべての設定・所持カード・自作デッキ・チュートリアルの記録を初期化します。\n' +
+                   'この操作は元に戻せません。',
+          buttons: [
+            { label: 'やめる' },
+            { label: '次へ', primary: true, onClick: function () {
+                /* ★もう一度たしかめます（仕様書 26.3）。
+                   一度の確認だと、勢いで押してしまえます。 */
+                showDialog({
+                  title: '本当に初期化しますか',
+                  message: '書き出していないデータは戻せません。\n\n本当に初期化しますか？',
+                  buttons: [
+                    { label: 'やめる' },
+                    { label: '初期化する', primary: true, onClick: function () {
+                        const r = SaveManager.reset();
+                        if (!r.ok) {
+                          self._done('初期化できませんでした。');
+                          return;
+                        }
+                        self._afterSaveDataChanged();
+                        self._done('すべて初期化しました。');
+                      } },
+                  ],
+                });
+              } },
+          ],
+        });
+      });
+    }
+  },
+
+  /** 読み込みや初期化のあと、画面を作り直す */
+  _afterSaveDataChanged: function () {
+    this._restore();
+    this._renderSettings();
+    /* デッキ一覧やカード一覧は、開くたびに SaveManager から読み直す作りなので、
+       ここで何かを呼ぶ必要はありません。次に開いたとき新しい内容になります。 */
+  },
+
+  /** 文字列をファイルとして保存させる */
+  _downloadText: function (name, text) {
+    const blob = new Blob([text], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // すぐ消すと保存が間に合わないことがあるので、少し待ってから片づけます
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
   },
 
   _done: function (msg) {

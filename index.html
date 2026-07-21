@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>マヨイビト v0.3</title>
-<link rel="stylesheet" href="css/layout.css?v=0.6.9">
+<!-- 版は version.js が起動時に入れます（v0.6.10）。
+       ここに直接書くと、更新のたび取り残されるためです。 -->
+  <title>マヨイビト</title>
+<link rel="stylesheet" href="css/layout.css?v=0.6.10">
 </head>
 <body>
 
@@ -881,6 +883,31 @@
             <div class="menu__hint">この画面の設定を最初の状態へ戻します。対戦中の内容は消えません。</div>
           </div>
 
+          <!-- セーブデータの持ち出しと持ち込み（仕様書 26） -->
+          <div class="menu__section">
+            <div class="menu__label">セーブデータ</div>
+            <button type="button" class="menu__wide" id="opt-save-export">セーブデータを書き出す</button>
+            <div class="menu__hint">
+              所持カード・自作デッキ・チュートリアルの記録・設定を、1つのファイルに保存します。
+              端末を変えるときや、消えて困るときの備えになります。
+            </div>
+            <button type="button" class="menu__wide" id="opt-save-import">セーブデータを読み込む</button>
+            <div class="menu__hint">
+              書き出したファイルから元に戻します。いまのデータは置き換わります。
+            </div>
+            <!-- ファイルを選ぶための入れもの。画面には出しません -->
+            <input type="file" id="opt-save-file" accept="application/json,.json" hidden>
+          </div>
+
+          <div class="menu__section">
+            <div class="menu__label">すべて初期化</div>
+            <button type="button" class="menu__wide menu__wide--warn" id="opt-save-reset">すべて初期化</button>
+            <div class="menu__hint">
+              設定・所持カード・自作デッキ・チュートリアルの記録を、すべて最初の状態へ戻します。
+              元に戻せないので、先に書き出しておくことをおすすめします。
+            </div>
+          </div>
+
           <div class="menu__done" id="opt-done"></div>
 
         </div>
@@ -1061,52 +1088,52 @@
   </div>
 </div>
 
-<script src="js/cards.js?v=0.6.9"></script>
-<script src="js/decks.js?v=0.6.9"></script>
-<script src="js/random.js?v=0.6.9"></script>
-<script src="js/effects.js?v=0.6.9"></script>
-<script src="js/game.js?v=0.6.9"></script>
+<script src="js/cards.js?v=0.6.10"></script>
+<script src="js/decks.js?v=0.6.10"></script>
+<script src="js/random.js?v=0.6.10"></script>
+<script src="js/effects.js?v=0.6.10"></script>
+<script src="js/game.js?v=0.6.10"></script>
 <!-- CPU対戦のAI（v0.3で追加。読み込み順は ai-core → ai-heuristic → ai-deckstack → ai-player） -->
-<script src="js/ai-core.js?v=0.6.9"></script>
-<script src="js/ai-heuristic.js?v=0.6.9"></script>
-<script src="js/ai-deckstack.js?v=0.6.9"></script>
-<script src="js/ai-player.js?v=0.6.9"></script>
-<script src="js/ai-uiops.js?v=0.6.9"></script>
-<script src="js/card-images.js?v=0.6.9"></script>
-<script src="js/version.js?v=0.6.9"></script>
-<script src="js/events.js?v=0.6.9"></script>
-<script src="js/errors.js?v=0.6.9"></script>
-<script src="js/save-manager.js?v=0.6.9"></script>
-<script src="js/collection.js?v=0.6.9"></script>
-<script src="js/card-filter.js?v=0.6.9"></script>
-<script src="js/deck-validator.js?v=0.6.9"></script>
-<script src="js/deck-manager.js?v=0.6.9"></script>
-<script src="js/assets.js?v=0.6.9"></script>
-<script src="js/storage.js?v=0.6.9"></script>
-<script src="js/se.js?v=0.6.9"></script>
-<script src="js/howto.js?v=0.6.9"></script>
-<script src="js/card-list-ui.js?v=0.6.9"></script>
-<script src="js/deck-list-ui.js?v=0.6.9"></script>
-<script src="js/deck-editor-ui.js?v=0.6.9"></script>
-<script src="js/deck-picker-ui.js?v=0.6.9"></script>
-<script src="js/result.js?v=0.6.9"></script>
+<script src="js/ai-core.js?v=0.6.10"></script>
+<script src="js/ai-heuristic.js?v=0.6.10"></script>
+<script src="js/ai-deckstack.js?v=0.6.10"></script>
+<script src="js/ai-player.js?v=0.6.10"></script>
+<script src="js/ai-uiops.js?v=0.6.10"></script>
+<script src="js/card-images.js?v=0.6.10"></script>
+<script src="js/version.js?v=0.6.10"></script>
+<script src="js/events.js?v=0.6.10"></script>
+<script src="js/errors.js?v=0.6.10"></script>
+<script src="js/save-manager.js?v=0.6.10"></script>
+<script src="js/collection.js?v=0.6.10"></script>
+<script src="js/card-filter.js?v=0.6.10"></script>
+<script src="js/deck-validator.js?v=0.6.10"></script>
+<script src="js/deck-manager.js?v=0.6.10"></script>
+<script src="js/assets.js?v=0.6.10"></script>
+<script src="js/storage.js?v=0.6.10"></script>
+<script src="js/se.js?v=0.6.10"></script>
+<script src="js/howto.js?v=0.6.10"></script>
+<script src="js/card-list-ui.js?v=0.6.10"></script>
+<script src="js/deck-list-ui.js?v=0.6.10"></script>
+<script src="js/deck-editor-ui.js?v=0.6.10"></script>
+<script src="js/deck-picker-ui.js?v=0.6.10"></script>
+<script src="js/result.js?v=0.6.10"></script>
 
 <!-- チュートリアル（v0.5で追加）
      読み込み順は game.js のあと。台本の仕込みがルール処理を前提にするためです。
      tutorial-deck  … 手札と山札を台本どおりに並べる
      tutorial-basic-data … 基本編の台本（説明文・ステップ・CPUの動き） -->
-<script src="js/tutorial-deck.js?v=0.6.9"></script>
-<script src="js/tutorial-basic-data.js?v=0.6.9"></script>
-<script src="js/tutorial-advanced-data.js?v=0.6.9"></script>
-<script src="js/tutorial-controller.js?v=0.6.9"></script>
-<script src="js/tutorial-ui.js?v=0.6.9"></script>
-<script src="js/tutorial-actions.js?v=0.6.9"></script>
-<script src="js/tutorial-cpu-driver.js?v=0.6.9"></script>
-<script src="js/screens.js?v=0.6.9"></script>
-<script src="js/cpu-driver.js?v=0.6.9"></script>
-<script src="js/preview.js?v=0.6.9"></script>
+<script src="js/tutorial-deck.js?v=0.6.10"></script>
+<script src="js/tutorial-basic-data.js?v=0.6.10"></script>
+<script src="js/tutorial-advanced-data.js?v=0.6.10"></script>
+<script src="js/tutorial-controller.js?v=0.6.10"></script>
+<script src="js/tutorial-ui.js?v=0.6.10"></script>
+<script src="js/tutorial-actions.js?v=0.6.10"></script>
+<script src="js/tutorial-cpu-driver.js?v=0.6.10"></script>
+<script src="js/screens.js?v=0.6.10"></script>
+<script src="js/cpu-driver.js?v=0.6.10"></script>
+<script src="js/preview.js?v=0.6.10"></script>
 <!-- 起動役。preview.js の関数を使うので、必ずそのあとに読みます -->
-<script src="js/tutorial-finish.js?v=0.6.9"></script>
-<script src="js/tutorial-runner.js?v=0.6.9"></script>
+<script src="js/tutorial-finish.js?v=0.6.10"></script>
+<script src="js/tutorial-runner.js?v=0.6.10"></script>
 </body>
 </html>

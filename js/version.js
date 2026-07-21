@@ -14,13 +14,24 @@
 
 'use strict';
 
-const APP_VERSION = '0.6.9';
+const APP_VERSION = '0.6.10';
 const APP_TITLE = '『マヨイビト』DCG';
 
-/* 画面やコピーに出す表記（例：v0.3.0） */
+/* 画面やコピーに出す表記（例：v0.6.10） */
 const APP_VERSION_LABEL = 'v' + APP_VERSION;
+
+/* ★ブラウザのタブに出す題名も、ここから作ります（v0.6.10）。
+   index.html に版を直接書いていたため、v0.3 のまま取り残されていました。
+   一箇所を直せば全部そろうようにしておきます。 */
+if (typeof document !== 'undefined') {
+  document.title = 'マヨイビト ' + APP_VERSION_LABEL;
+}
 
 /* Node.jsでのテスト用（ブラウザでは無視されます） */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { APP_VERSION: APP_VERSION, APP_TITLE: APP_TITLE };
+  module.exports = {
+    APP_VERSION: APP_VERSION,
+    APP_TITLE: APP_TITLE,
+    APP_VERSION_LABEL: APP_VERSION_LABEL,
+  };
 }
