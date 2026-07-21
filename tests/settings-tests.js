@@ -149,6 +149,49 @@ console.log('\n■ 音が使えない環境でも止まらない（仕様書 33-
   check('例外を投げずに進む', !err, err || '');
 }
 
+console.log('\n■ ★セーブデータの書き出し・読み込み（v0.6.10・仕様書26）');
+{
+  const fs2 = require('fs');
+  const html2 = fs2.readFileSync('index.html', 'utf8');
+  const sc = fs2.readFileSync('js/screens.js', 'utf8');
+  const sm = fs2.readFileSync('js/save-manager.js', 'utf8');
+
+  /* 仕組みは前からありましたが、画面から使えませんでした。
+     ブラウザのデータが消えると取り返しがつかないので、
+     設定画面から書き出せるようにしました。 */
+  check('★書き出すボタンがある', html2.indexOf('id="opt-save-export"') !== -1);
+  check('★読み込むボタンがある', html2.indexOf('id="opt-save-import"') !== -1);
+  check('★すべて初期化のボタンがある', html2.indexOf('id="opt-save-reset"') !== -1);
+  check('ファイルを選ぶ入れものがある', html2.indexOf('id="opt-save-file"') !== -1);
+  check('JSONだけを選べるようにしている', /accept="application\/json/.test(html2));
+
+  check('書き出しの中身がある', /exportText: function/.test(sm));
+  check('読み込みの中身がある', /importText: function/.test(sm));
+  check('ファイル名を作る仕組みがある', /exportFileName: function/.test(sm));
+
+  check('★画面が書き出しを呼んでいる', /SaveManager\.exportText\(\)/.test(sc));
+  check('★画面が読み込みを呼んでいる', /SaveManager\.importText\(/.test(sc));
+  check('★画面が初期化を呼んでいる', /SaveManager\.reset\(\)/.test(sc));
+
+  /* 上書きと初期化は、取り返しがつきません */
+  const importPart = sc.slice(sc.indexOf("'opt-save-import'"),
+                              sc.indexOf("'opt-save-reset'"));
+  check('★読み込む前に、置き換わることを伝える',
+    /置き換わります/.test(importPart),
+    '選んだあとに知らせても遅いためです');
+
+  const resetPart = sc.slice(sc.indexOf("'opt-save-reset'"));
+  const confirms = (resetPart.match(/showDialog\(/g) || []).length;
+  check('★初期化は二段階で確認する（仕様書26.3）', confirms >= 2,
+    '確認は ' + confirms + ' 回');
+  check('元に戻せないことを伝える', /元に戻せません/.test(resetPart));
+
+  /* 読み込めなかったときに、黙って進まないこと */
+  check('★読み込めなければ、いまのデータを残す',
+    /いまのデータはそのまま/.test(sc));
+  check('直した箇所があれば知らせる', /repairs/.test(sc));
+}
+
 console.log('\n' + (fail === 0
   ? '===== 設定・SE・保存：' + pass + '/' + pass + ' 通過 ====='
   : '===== 失敗 ' + fail + '件 ====='));
